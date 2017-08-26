@@ -2,6 +2,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Text;
 using Windows.Devices.Enumeration;
 using Windows.UI.Core;
 using Windows.UI.Popups;
@@ -18,6 +19,7 @@ namespace OrpheTestApp
         {
             this.InitializeComponent();
         }
+
 
         private DeviceWatcher _DeviceWatcher;
         private ObservableCollection<string> _DeviceIdList = new ObservableCollection<string>();
@@ -112,6 +114,54 @@ namespace OrpheTestApp
         {
             var now = DateTime.Now;
             Debug.WriteLine("{0:HHmmssfff} {1:f3} {2:f3} {3:f3}", now, e.Acceleration.x, e.Acceleration.y, e.Acceleration.z);
+
+            if (iotHubBroker != null && iotHubBroker.IsConnected)
+            {
+                iotHubBroker.Send("", e.Acceleration.x, e.Acceleration.y, e.Acceleration.z, now);
+            }
+        }
+
+        private AzureIoTHubBroker iotHubBroker;
+
+        private async void buttonAzureIoTHubConn_Click(System.Object sender, RoutedEventArgs e)
+        {
+            if (iotHubBroker == null)
+            {
+                if (string.IsNullOrEmpty(tbIoTHubCS.Text))
+                {
+                    var msgDialog =new MessageDialog("Please set IoT Hub Device Connection String!");
+                    await msgDialog.ShowAsync();
+                    return;
+                }
+                iotHubBroker = new AzureIoTHubBroker(tbIoTHubCS.Text);
+                iotHubBroker.OnC2DMessageReceived += IotHubBroker_OnC2DMessageReceived;
+            }
+            switch (buttonAzureIoTHubConn.Content.ToString())
+            {
+                case "Connect":
+                    await iotHubBroker.ConnectAsync();
+                    buttonAzureIoTHubConn.Content = "Start";
+                    break;
+                case "Start":
+                     iotHubBroker.Start(int.Parse(tbIoTSendIntervalMS.Text));
+                    buttonAzureIoTHubConn.Content = "Stop";
+                    break;
+                case "Stop":
+                    iotHubBroker.Stop();
+                    buttonAzureIoTHubConn.Content = "Disconnect";
+                    break;
+                case "Disconnect":
+                    await iotHubBroker.CloseAsync();
+                    buttonAzureIoTHubConn.Content = "Connect";
+                    break;
+            }
+        }
+
+        private void IotHubBroker_OnC2DMessageReceived(object src, string message)
+        {
+            var sb = new StringBuilder(tbAzureIoTLog.Text);
+            sb.AppendLine(message);
+            tbAzureIoTLog.Text = sb.ToString();
         }
     }
 }
