@@ -117,7 +117,7 @@ namespace OrpheTestApp
 
             if (iotHubBroker != null && iotHubBroker.IsConnected)
             {
-                iotHubBroker.Send("", e.Acceleration.x, e.Acceleration.y, e.Acceleration.z, now);
+                iotHubBroker.Send("", e.Acceleration.x, e.Acceleration.y, e.Acceleration.z, e.Gyro.x,e.Gyro.y,e.Gyro.z, e.Compass,e.Quaternion.w,e.Quaternion.x,e.Quaternion.y,e.Quaternion.z,e.Shock, now);
             }
         }
 

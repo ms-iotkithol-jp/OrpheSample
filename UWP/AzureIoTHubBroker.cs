@@ -62,7 +62,7 @@ namespace OrpheTestApp
             }
         }
 
-        public void Send(string side, double ax, double ay, double az,DateTime ts)
+        public void Send(string side, double ax, double ay, double az,double gx,double gy, double gz,double compass, double qw, double qx, double qy, double qz, byte shock, DateTime ts)
         {
             lock (this)
             {
@@ -72,6 +72,15 @@ namespace OrpheTestApp
                     AccelX = ax,
                     AccelY = ay,
                     AccelZ = az,
+                    GyroX = gx,
+                    GyroY = gy,
+                    GyroZ = gz,
+                    Compass = compass,
+                    QuotW = qw,
+                    QuotX = qx,
+                    QuotY = qy,
+                    QuotZ = qz,
+                    Shock = shock,
                     MeasuredTime = ts
                 });
             }
@@ -116,5 +125,14 @@ namespace OrpheTestApp
         public double AccelX { get; set; }
         public double AccelY { get; set; }
         public double AccelZ { get; set; }
+        public double GyroX { get; set; }
+        public double GyroY { get; set; }
+        public double GyroZ { get; set; }
+        public double Compass { get; set; }
+        public double QuotW { get; set; }
+        public double QuotX { get; set; }
+        public double QuotY { get; set; }
+        public double QuotZ { get; set; }
+        public byte Shock { get; set; }
     }
 }
